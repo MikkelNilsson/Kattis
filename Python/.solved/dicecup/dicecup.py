@@ -1,6 +1,3 @@
-from tokenize import String
-
-
 l = [int(i) for i in input().split()]
 
 results = [0 for _ in range(l[0]+l[1] + 1)]
