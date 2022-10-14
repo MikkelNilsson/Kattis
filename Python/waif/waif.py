@@ -1,15 +1,22 @@
 n, m, p = map(int, input().split())
 
+sink = n+m+p+1
 
 l = dict([(i, dict()) for i in range(n+m+p+2)])
 l[0] = dict([(i+1, 1) for i in range(n)])
 
-for i in range(1, n+1):
-    l[i] = dict([(n+int(j), 1) for j in input().split()[1:]])
-
 # residual graph
 for i in range(1, n+1):
     l[i][0] = 0
+
+
+
+for i in range(1, n+1):
+    for j in input().split()[1:]:
+        l[i][n + int(j)] = 1
+        # residual graph
+        l[n + int(j)][i] = 0
+
 
 s = set(range(1, m+1))
 for i in range(1,p+1):
@@ -19,13 +26,46 @@ for i in range(1,p+1):
         l[n+int(t)][n+m+i] = 1
         # residual graph
         l[n+m+i][n+int(t)] = 0
-    l[n+m+i][n+m+p+1] = int(c[-1])
+    l[n+m+i][sink] = int(c[-1])
     # residual graph
-    l[n+m+p+1][n+m+i] = 0
+    l[sink][n+m+i] = 0
 
 for i in s:
-    l[n+i][n+m+p+1] = 1
+    l[n+i][sink] = 1
+    l[sink][n+i] = 0
+
+#print(l)
 
 
+def dfs(node: int, max_weight: int, seen) -> int:
+    for next in l[node].keys():
+        #print(next, seen)
+        if next in seen or l[node][next] < 1:
+            #print("Seen")
+            continue
 
-print(l)
+        if next == sink:
+            weight = min(max_weight, l[node][next])
+            l[node][next] -= weight
+            return weight
+
+        seen1 = set(seen)
+        seen1.add(node)
+        res_weight = dfs(next, min(max_weight, l[node][next]), seen1)
+        if res_weight > 0:
+            #print(node, next)
+            l[node][next] -= res_weight
+            l[next][node] += res_weight
+            return res_weight
+    return -1
+    
+
+INF = 10**6 
+cur_flow = 0
+flow = 0
+while (cur_flow != -1):
+    flow += cur_flow
+    cur_flow = dfs(0, INF, set())
+    #print("---------------Done:", cur_flow)
+
+print(flow)
