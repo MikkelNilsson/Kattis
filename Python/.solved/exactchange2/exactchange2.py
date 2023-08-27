@@ -23,7 +23,7 @@ def run():
     for x in range(price, 20000):
         if minimum_coins(x, n-1) < INF:
             print(x, minimum_coins(x, n-1))
-            break;
+            break
 
 
 for _ in range(t):
